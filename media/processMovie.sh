@@ -1,6 +1,7 @@
 #!/bin/ksh
 
 MOVIE_DIR="/archive/media/movies"
+SCRIPT_DIR="/var/sabnzbd/scripts"
 
 echo "SAB_FINAL_NAME: $SAB_FINAL_NAME"
 echo "SAB_FILENAME: $SAB_FILENAME"
@@ -32,3 +33,11 @@ mkdir -pm 775 "$dest_dir"
 #ln "$src_file" "$dest_file"
 nice -n 20 cp -v "$src_file" "$dest_file"
 chmod 644 "$dest_file"
+
+if [ -e "$SCRIPT_DIR/plex.sh" ]; then
+    . "$SCRIPT_DIR/plex.sh"
+    echo "PLEX_API_URL: $PLEX_API_URL"
+    echo -n "Triggering Plex Library scan..."
+    curl -s "$PLEX_API_URL/library/sections/$PLEX_API_MOVIES_KEY/refresh?X-Plex-Token=$PLEX_API_TOKEN"
+    echo "Done."
+fi
