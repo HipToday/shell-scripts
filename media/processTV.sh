@@ -1,18 +1,44 @@
-#!/bin/sh
+#!/bin/ksh
 
-friendly_title="Seinfeld"
-# Usually period-separated
-filename_title="Seinfeld"
-season="02"
+TV_SHOW_DIR="/archive/media/tvshows"
 
-dest_dir="/archive/media/tvshows/$friendly_title/Season $season"
+echo "SAB_FINAL_NAME: $SAB_FINAL_NAME"
+echo "SAB_FILENAME: $SAB_FILENAME"
+echo "SAB_COMPLETE_DIR: $SAB_COMPLETE_DIR"
+echo "SAB_PP_STATUS: $SAB_PP_STATUS"
 
-mkdir -p "$dest_dir"
-
-for src_dir in $filename_title.S$season*; do
-	echo "$src_dir"
-	video_filename=$(ls "$src_dir/"*.mkv)
-	#echo "$video_filename"
-	ln "$video_filename" "$dest_dir/$src_dir.mkv"
+# Loop through all command-line parameters
+i=1
+for arg in "$@"
+do
+    echo "Argument $i: $arg"
+    ((i++))
 done
 
+# See https://sabnzbd.org/wiki/configuration/4.3/scripts/post-processing-scripts
+FINAL_DIR="$1"
+JOB_NAME="$3"
+
+src_file=$(ls "$FINAL_DIR/"*.mkv)
+echo "Source File: $src_file"
+
+# Get everything before the "SxxExx" part of the job name
+show_name=$(echo "$JOB_NAME" | sed "s/\(.*\)[sS][0-9]\{1,\}[eE][0-9]\{1,\}.*/\1/")
+# Replace periods with spaces and trim spaces off the end
+show_name=$(echo "$show_name" | sed  "s/\./ /g" | sed "s/ *$//")
+echo "Show Name: $show_name"
+
+# Get the season
+season=$(echo "$JOB_NAME" | sed "s/.*[sS]\([0-9]\{1,\}\)[eE][0-9]\{1,\}.*/\1/")
+echo "Season: $season"
+
+# Build the destination file location
+dest_dir="$TV_SHOW_DIR/$show_name/Season $season"
+dest_file="$dest_dir/$JOB_NAME.mkv"
+echo "Destination File: '$dest_file'"
+
+mkdir -pm 775 "$dest_dir"
+# TODO - Could we try a hard link first?
+#ln "$src_file" "$dest_file"
+nice -n 20 cp -v "$src_file" "$dest_file"
+chmod 644 "$dest_file"
