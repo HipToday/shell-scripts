@@ -34,11 +34,13 @@ season=$(echo "$JOB_NAME" | sed "s/.*[sS]\([0-9]\{1,\}\)[eE][0-9]\{1,\}.*/\1/")
 echo "Season: $season"
 
 # Build the destination file location
-dest_dir="$TV_SHOW_DIR/$show_name/Season $season"
-dest_file="$dest_dir/$JOB_NAME.mkv"
+show_dir="$TV_SHOW_DIR/$show_name"
+season_dir="$show_dir/Season $season"
+dest_file="$season_dir/$JOB_NAME.mkv"
 echo "Destination File: '$dest_file'"
 
-mkdir -pm 775 "$dest_dir"
+mkdir -pm 775 "$season_dir"
+chmod 775 "$show_dir"
 # TODO - Could we try a hard link first?
 #ln "$src_file" "$dest_file"
 nice -n 20 cp -v "$src_file" "$dest_file"
