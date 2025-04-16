@@ -57,3 +57,31 @@ Function Find-String([string]$Pattern) {
   }
 }
 Set-Alias -Name "findit" -Description "Searches all files in the current directory recursively for the given pattern" -Value Find-String -Force
+
+<#
+.SYNOPSIS
+    Configure PSReadLine key handlers for history search and bash-style completion.
+.DESCRIPTION
+    This function sets up key handlers for PSReadLine to enable history search and bash-style completion.
+    It configures the up and down arrow keys to search through command history based on the current input.
+    It also enables tab completion for commands, similar to Bash behavior.
+.LINK
+    https://github.com/PowerShell/PSReadLine
+#>
+Function Set-PSReadLineKeyHandlers() {
+  if (!(Get-Module -Name PSReadLine -ListAvailable)) {
+    Write-Host "PSReadLine module is not installed."
+    return
+  }
+
+  # With these bindings, up arrow/down arrow will work like PowerShell/cmd if
+  # the current command line is blank. If you've entered some text though, it
+  # will search the history for commands that start with the currently entered
+  # text.
+  Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
+  Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
+
+  # Enable Bash-style completion
+  Set-PSReadLineKeyHandler -Key Tab -Function Complete
+}
+Set-PSReadLineKeyHandlers
