@@ -20,7 +20,12 @@ done
 FINAL_DIR="$1"
 JOB_NAME="$3"
 
-src_file=$(ls "$FINAL_DIR/"*.mkv)
+# Get the first .mkv file in the final directory and verify it exists
+src_file=$(ls -1 "$FINAL_DIR/"*.mkv | head -n 1)
+if [ -z "$src_file" ]; then
+    echo "Error: No .mkv file found in $FINAL_DIR"
+    exit 1
+fi
 echo "Source File: $src_file"
 
 # Get everything before the "SxxExx" part of the job name
@@ -53,3 +58,7 @@ if [ -e "$SCRIPT_DIR/plex.sh" ]; then
     curl -s "$PLEX_API_URL/library/sections/$PLEX_API_SHOWS_KEY/refresh?X-Plex-Token=$PLEX_API_TOKEN"
     echo "Done."
 fi
+
+# If we got here, all went well, so let's clean up the final directory
+echo "Cleaning up $FINAL_DIR"
+rm -rf "$FINAL_DIR"
