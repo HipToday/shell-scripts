@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/bash
 
 MOVIE_DIR="/archive/media/movies"
 SCRIPT_DIR="/var/sabnzbd/scripts"

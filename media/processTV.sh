@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/bash
 
 TV_SHOW_DIR="/archive/media/tvshows"
 SCRIPT_DIR="/var/sabnzbd/scripts"
