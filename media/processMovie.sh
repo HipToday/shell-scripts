@@ -1,7 +1,7 @@
 #!/bin/bash
 
-MOVIE_DIR="/archive/media/movies"
-SCRIPT_DIR="/var/sabnzbd/scripts"
+MOVIE_DIR="/mnt/archive/media/movies"
+SCRIPT_DIR="/var/lib/sabnzbdplus/.sabnzbd/scripts"
 
 echo "SAB_FINAL_NAME: $SAB_FINAL_NAME"
 echo "SAB_FILENAME: $SAB_FILENAME"

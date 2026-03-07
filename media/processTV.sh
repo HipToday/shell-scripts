@@ -1,7 +1,7 @@
 #!/bin/bash
 
-TV_SHOW_DIR="/archive/media/tvshows"
-SCRIPT_DIR="/var/sabnzbd/scripts"
+TV_SHOW_DIR="/mnt/archive/media/tvshows"
+SCRIPT_DIR="/var/lib/sabnzbdplus/.sabnzbd/scripts"
 
 echo "SAB_FINAL_NAME: $SAB_FINAL_NAME"
 echo "SAB_FILENAME: $SAB_FILENAME"
