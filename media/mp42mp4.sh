@@ -41,16 +41,32 @@ for INPUT_FILE in *.mp4; do
     # Remove any extra whitespace from the codec name
     AUDIO_CODEC=$(echo "$AUDIO_CODEC" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
     
+    # Get the number of audio channels
+    AUDIO_CHANNELS=$("${FFPROBE_CMD}" -v error \
+                                      -select_streams a:0 \
+                                      -show_entries stream=channels \
+                                      -of default=noprint_wrappers=1:nokey=1 \
+                                      "${INPUT_FILE}")
+    
+    # Remove any extra whitespace from the channel count
+    AUDIO_CHANNELS=$(echo "$AUDIO_CHANNELS" | tr -d '[:space:]')
+    
     # Set the default copy parameters (copy everything)
     VIDEO_COPY_PARAM="-c:v copy"
     AUDIO_PARAM="-c:a copy"
 
     # 2. Check if the audio codec needs re-encoding
     if [[ "$AUDIO_CODEC" != "" && "$AUDIO_CODEC" != "unknown" ]]; then
-        if [[ "$AUDIO_CODEC" == $COMPATIBLE_AUDIO ]]; then
-            echo "  Audio codec '$AUDIO_CODEC' is compatible. Skipping conversion."
+        if [[ "$AUDIO_CODEC" == $COMPATIBLE_AUDIO && "$AUDIO_CHANNELS" == "2" ]]; then
+            echo "  Audio codec '$AUDIO_CODEC' with $AUDIO_CHANNELS channels is compatible. Skipping conversion."
             echo "---"
             continue
+        elif [[ "$AUDIO_CODEC" == $COMPATIBLE_AUDIO && "$AUDIO_CHANNELS" != "2" ]]; then
+            echo "  Audio codec '$AUDIO_CODEC' is compatible but has $AUDIO_CHANNELS channels. Re-encoding to stereo."
+            # Re-encode to stereo while keeping AAC
+            AUDIO_PARAM="-c:a aac -b:a 192k -ac 2"
+            # Optional: Add an audio stream selection map to ensure we pick the right one
+            AUDIO_PARAM="$AUDIO_PARAM -map 0:a:0"
         else
             echo "  Audio codec '$AUDIO_CODEC' is INCOMPATIBLE. Re-encoding audio to AAC (192k, stereo)."
             # Re-encode to AAC and set a reasonable bitrate, downmix to stereo
