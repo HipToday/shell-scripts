@@ -52,9 +52,9 @@ for INPUT_FILE in *.mp4; do
             echo "---"
             continue
         else
-            echo "  Audio codec '$AUDIO_CODEC' is INCOMPATIBLE. Re-encoding audio to AAC (192k)."
-            # Re-encode to AAC and set a reasonable bitrate
-            AUDIO_PARAM="-c:a aac -b:a 192k"
+            echo "  Audio codec '$AUDIO_CODEC' is INCOMPATIBLE. Re-encoding audio to AAC (192k, stereo)."
+            # Re-encode to AAC and set a reasonable bitrate, downmix to stereo
+            AUDIO_PARAM="-c:a aac -b:a 192k -ac 2"
             # Optional: Add an audio stream selection map to ensure we pick the right one
             AUDIO_PARAM="$AUDIO_PARAM -map 0:a:0" 
         fi
