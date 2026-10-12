@@ -7,6 +7,31 @@ Function ll() {
   Get-ChildItem -Force
 }
 
+<#
+.SYNOPSIS
+Lists all environment variables.
+
+.DESCRIPTION
+Wrapper around Get-ChildItem Env: that mimics the Unix 'env' command by
+returning every environment variable in the current session.
+
+.EXAMPLE
+env
+
+Lists all environment variables and their values.
+
+.EXAMPLE
+env | Where-Object Name -like 'PATH*'
+
+Lists only the environment variables whose names start with PATH.
+
+.OUTPUTS
+System.Collections.DictionaryEntry
+#>
+Function env() {
+  Get-ChildItem Env:
+}
+
 # Merge BranchName into current branch
 Function Merge-Branch([string]$BranchName) {
   git status
