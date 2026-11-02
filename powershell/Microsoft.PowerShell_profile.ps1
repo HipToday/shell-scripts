@@ -129,3 +129,62 @@ Function Set-PSReadLineKeyHandlers() {
   Set-PSReadLineKeyHandler -Key Tab -Function TabCompleteNext
 }
 Set-PSReadLineKeyHandlers
+
+<#
+.SYNOPSIS
+Sets JAVA_HOME to the latest JDK installed alongside the current one.
+
+.DESCRIPTION
+Looks in the parent directory of CurrentJavaHome (or, if not supplied, of the
+JAVA_HOME environment variable, or, if that is not set either, in
+"C:\Program Files\Amazon Corretto") for the JDK directory with the highest
+version and sets JAVA_HOME to it, in both the user environment (persisted) and
+the current session. If the directory to search doesn't exist, or contains no
+JDKs, JAVA_HOME is removed from both.
+
+.PARAMETER CurrentJavaHome
+Path of the current JDK directory. Its parent directory is searched for JDKs.
+
+.EXAMPLE
+Set-JavaHomeToLatestInstalled
+
+.EXAMPLE
+Set-JavaHomeToLatestInstalled -CurrentJavaHome 'C:\Program Files\Amazon Corretto\jdk17.0.9_9'
+#>
+Function Set-JavaHomeToLatestInstalled([string]$CurrentJavaHome) {
+  if (!$CurrentJavaHome) { $CurrentJavaHome = $Env:JAVA_HOME }
+
+  if ($CurrentJavaHome) {
+    $JdkParentDir = Split-Path -Path $CurrentJavaHome.TrimEnd('\', '/') -Parent
+  } else {
+    $JdkParentDir = 'C:\Program Files\Amazon Corretto'
+  }
+
+  $Latest = $null
+  if ($JdkParentDir -and (Test-Path -Path $JdkParentDir -PathType Container)) {
+    # Directory names look like jdk1.8.0_392 or jdk17.0.9_9, so turn the
+    # numeric part into a [version] (1.8.0.392, 17.0.9.9) for sorting.
+    $Latest = Get-ChildItem -Path $JdkParentDir -Directory |
+      ForEach-Object {
+        if ($_.Name -match '^jdk(\d+(?:[._]\d+)*)') {
+          [pscustomobject]@{ Dir = $_; Version = [version]($Matches[1] -replace '_', '.') }
+        }
+      } |
+      Sort-Object -Property Version -Descending |
+      Select-Object -First 1 -ExpandProperty Dir
+  }
+
+  # Update the user environment (persisted) and the current session. Passing
+  # $null as the value removes the variable.
+  $NewJavaHome = if ($Latest) { $Latest.FullName } else { $null }
+  [Environment]::SetEnvironmentVariable('JAVA_HOME', $NewJavaHome, 'User')
+  [Environment]::SetEnvironmentVariable('JAVA_HOME', $NewJavaHome, 'Process')
+
+  if ($Latest) {
+    Write-Host "JAVA_HOME set to $NewJavaHome"
+  } else {
+    Write-Host "No JDK found in '$JdkParentDir'; JAVA_HOME removed"
+  }
+}
+Set-JavaHomeToLatestInstalled
+
