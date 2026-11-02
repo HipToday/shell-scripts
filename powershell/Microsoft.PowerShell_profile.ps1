@@ -106,7 +106,12 @@ Function Set-PSReadLineKeyHandlers() {
   Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
   Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 
-  # Enable Bash-style completion
-  Set-PSReadLineKeyHandler -Key Tab -Function Complete
+  # Set the tab completion mode options are as follows:
+  #   Complete: Complete the current word and display a list of possible completions.
+  #   TabCompleteNext: Cycle through the list of completions in order.
+  #   TabCompletePrevious: Cycle through the list of completions in reverse order.
+  #   MenuComplete: Display a menu of possible completions and allow the user to select one (Ctrl+Space default binding).
+  #   PossibleCompletions: Display a list of possible completions without completing the current word.
+  Set-PSReadLineKeyHandler -Key Tab -Function TabCompleteNext
 }
 Set-PSReadLineKeyHandlers
