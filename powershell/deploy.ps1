@@ -14,6 +14,4 @@ if ($PROFILE) {
 Write-Host "Copying PowerShell profile to: $profilePath"
 Copy-Item -Path "Microsoft.PowerShell_profile.ps1" -Destination $profilePath -Force
 
-# Load the new profile
-Write-Host "Loading new PowerShell profile..."
-. $profilePath
+Write-Host "Profile deployed. Run '. `$PROFILE' to load the new profile in the current session."
