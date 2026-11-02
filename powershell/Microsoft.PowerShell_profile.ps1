@@ -147,7 +147,7 @@ Function Set-PSReadLineKeyHandlers() {
   #   TabCompletePrevious: Cycle through the list of completions in reverse order.
   #   MenuComplete: Display a menu of possible completions and allow the user to select one (Ctrl+Space default binding).
   #   PossibleCompletions: Display a list of possible completions without completing the current word.
-  Set-PSReadLineKeyHandler -Key Tab -Function TabCompleteNext
+  Set-PSReadLineKeyHandler -Key Tab -Function Complete
 }
 Set-PSReadLineKeyHandlers
 
