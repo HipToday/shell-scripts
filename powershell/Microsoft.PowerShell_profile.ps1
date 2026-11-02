@@ -23,6 +23,27 @@ Function ll() {
 
 <#
 .SYNOPSIS
+Compares two files in the VS Code diff viewer.
+
+.DESCRIPTION
+Wrapper around 'code --diff'. Any arguments are passed through to VS Code,
+which expects the paths of the two files to compare.
+
+.EXAMPLE
+diff old.txt new.txt
+
+Opens old.txt and new.txt side by side in VS Code.
+#>
+Function diff() {
+  code --diff @args
+}
+# Remove the built-in 'diff' alias, which conflicts with the above function.
+if (Get-Alias diff -ErrorAction SilentlyContinue) {
+  Remove-Item Alias:diff -Force
+}
+
+<#
+.SYNOPSIS
 Lists all environment variables.
 
 .DESCRIPTION
