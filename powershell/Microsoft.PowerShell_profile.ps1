@@ -195,16 +195,26 @@ Function Set-JavaHomeToLatestInstalled([string]$CurrentJavaHome) {
       Select-Object -First 1 -ExpandProperty Dir
   }
 
-  # Update the user environment (persisted) and the current session. Passing
-  # $null as the value removes the variable.
   $NewJavaHome = if ($Latest) { $Latest.FullName } else { $null }
-  [Environment]::SetEnvironmentVariable('JAVA_HOME', $NewJavaHome, 'User')
-  [Environment]::SetEnvironmentVariable('JAVA_HOME', $NewJavaHome, 'Process')
+  # Update the user environment (persisted) and the current session, but only
+  # write when the stored value actually differs; this saves some significant
+  # time/CPU cycles when updating the user environment. Passing $null as the
+  # value removes the variable.
+  $ChangedScopes = @()
+  foreach ($Scope in 'User', 'Process') {
+    if ([Environment]::GetEnvironmentVariable('JAVA_HOME', $Scope) -ne $NewJavaHome) {
+      [Environment]::SetEnvironmentVariable('JAVA_HOME', $NewJavaHome, $Scope)
+      $ChangedScopes += $Scope
+    }
+  }
 
-  if ($Latest) {
-    Write-Host "JAVA_HOME set to $NewJavaHome"
-  } else {
-    Write-Host "No JDK found in '$JdkParentDir'; JAVA_HOME removed"
+  if ($ChangedScopes) {
+    $ScopeText = $ChangedScopes -join ' and '
+    if ($Latest) {
+      Write-Host "JAVA_HOME set to $NewJavaHome ($ScopeText)"
+    } else {
+      Write-Host "No JDK found in '$JdkParentDir'; JAVA_HOME removed ($ScopeText)"
+    }
   }
 }
 Set-JavaHomeToLatestInstalled
