@@ -3,8 +3,22 @@ Set-Alias less more
 
 $Env:DISPLAY = 'localhost:0.0'
 
+<#
+.SYNOPSIS
+Lists directory contents, including hidden and system items.
+
+.DESCRIPTION
+Wrapper around Get-ChildItem that always applies the -Force option. Any
+additional arguments are passed through to Get-ChildItem.
+
+.EXAMPLE
+ll
+
+.EXAMPLE
+ll C:\temp -Recurse
+#>
 Function ll() {
-  Get-ChildItem -Force
+  Get-ChildItem -Force @args
 }
 
 <#
