@@ -10,6 +10,13 @@ if ($PROFILE) {
     $profilePath = "$HOME\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
 }
 
+# Ensure the destination folder exists
+$profileDir = Split-Path -Parent $profilePath
+if (-not (Test-Path $profileDir)) {
+    Write-Host "Creating directory: $profileDir"
+    New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
+}
+
 # Copy the new profile to the profile path
 Write-Host "Copying PowerShell profile to: $profilePath"
 Copy-Item -Path "Microsoft.PowerShell_profile.ps1" -Destination $profilePath -Force
